@@ -18,7 +18,7 @@ const Home = () => {
               Voir les Stations de Vélos
             </span>
           </Link>
-          <Link href="/map/Map" passHref>
+          <Link href="/map" passHref>
             <span className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition duration-300">
               Voir la Carte
             </span>

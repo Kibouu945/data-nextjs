@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import io from 'socket.io-client';
 import 'leaflet/dist/leaflet.css';
 
 // Correction des icônes Leaflet par défaut
@@ -18,30 +18,50 @@ L.Icon.Default.mergeOptions({
 const MapComponent = () => {
   const [stations, setStations] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Appel à l'API RESTful du backend
-        const response = await axios.get('http://localhost:4000/api/bikes');
-        setStations(response.data.network.stations);
-      } catch (error) {
-        console.error('Erreur API RESTful :', (error as any).message);
-      }
+  // Fonction pour récupérer les données des stations
+  const fetchBounds = async (bounds: any) => {
+    try {
+      const response = await axios.get('http://localhost:4000/api/bikes', {
+        params: {
+          ne_lat: bounds._northEast.lat,
+          ne_lng: bounds._northEast.lng,
+          sw_lat: bounds._southWest.lat,
+          sw_lng: bounds._southWest.lng,
+        },
+      });
+      console.log('Réponse API :', response.data); // Débogage
+      setStations(response.data.stations || []);
+    } catch (error) {
+      console.error('Erreur API RESTful :', (error as any).message);
+    }
+  };
+
+  // Débounce pour limiter les requêtes
+  const debounce = (func: (...args: any) => void, delay: number) => {
+    let timer: NodeJS.Timeout;
+    return (...args: any) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
     };
+  };
 
-    // Récupération initiale via l'API RESTful
-    fetchData();
-
-    // Connexion Socket.IO pour les mises à jour en temps réel
-    const socket = io('http://localhost:4000');
-    socket.on('bikeData', (data) => {
-      setStations(data.network.stations);
+  // Composant pour récupérer les événements de la carte
+  const MapEvents = () => {
+    const map = useMapEvents({
+      moveend: debounce(() => {
+        const bounds = map.getBounds();
+        fetchBounds(bounds);
+      }, 500), // Attends 500 ms avant d'exécuter la requête
     });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    // Appelle `fetchBounds` une seule fois au chargement initial
+    useEffect(() => {
+      const bounds = map.getBounds();
+      fetchBounds(bounds);
+    }, [map]);
+
+    return null;
+  };
 
   return (
     <div className="w-full h-[500px]">
@@ -55,14 +75,14 @@ const MapComponent = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {stations.map((station, index) => (
-          <Marker key={index} position={[station.latitude, station.longitude]}>
-            <Popup>
-              <strong>{station.name}</strong> <br />
-              Vélos disponibles : {station.free_bikes}
-            </Popup>
-          </Marker>
-        ))}
+        <MapEvents />
+        <MarkerClusterGroup>
+          {stations.map((station, index) => (
+            <Marker key={index} position={[station.latitude, station.longitude]}>
+              <Popup>{station.name}</Popup>
+            </Marker>
+          ))}
+        </MarkerClusterGroup>
       </MapContainer>
     </div>
   );

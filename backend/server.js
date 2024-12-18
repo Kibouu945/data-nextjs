@@ -22,16 +22,55 @@ const BIKE_API_URL = 'https://api.citybik.es/v2/networks/citi-bike-nyc'; // API 
 app.use(cors());
 app.use(express.json());
 
+// Backend : Filtrage par Bounding Box
 // Route API pour récupérer les données des vélos
+let cachedData = null;
+let lastFetchTime = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes en millisecondes
+
 app.get('/api/bikes', async (req, res) => {
+  const { ne_lat, ne_lng, sw_lat, sw_lng } = req.query;
+  const currentTime = new Date().getTime();
+
+  // Utilise les données en cache si elles sont encore valides
+  if (cachedData && lastFetchTime && currentTime - lastFetchTime < CACHE_DURATION) {
+    console.log('Envoi des données depuis le cache');
+    const filteredStations = cachedData.filter(
+      (station) =>
+        station.latitude <= ne_lat &&
+        station.latitude >= sw_lat &&
+        station.longitude <= ne_lng &&
+        station.longitude >= sw_lng
+    );
+    return res.json({ stations: filteredStations });
+  }
+
   try {
+    console.log('Requête vers CityBik en cours...');
     const response = await axios.get(BIKE_API_URL);
-    res.json(response.data);
+    const stations = response.data.network.stations;
+
+    // Mise en cache des données
+    cachedData = stations;
+    lastFetchTime = new Date().getTime();
+
+    const filteredStations = stations.filter(
+      (station) =>
+        station.latitude <= ne_lat &&
+        station.latitude >= sw_lat &&
+        station.longitude <= ne_lng &&
+        station.longitude >= sw_lng
+    );
+
+    console.log('Données fraîches depuis l\'API externe.');
+    res.json({ stations: filteredStations });
   } catch (error) {
-    console.error('Erreur API:', error.message);
-    res.status(500).json({ error: 'Erreur lors de la récupération des données des vélos.' });
+    console.error('Erreur API externe :', error.message);
+    res.status(500).json({ error: 'Erreur lors de la récupération des données.' });
   }
 });
+
+
 
 // Socket.IO pour les mises à jour en temps réel
 io.on('connection', (socket) => {

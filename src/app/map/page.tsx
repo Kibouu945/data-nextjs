@@ -1,5 +1,11 @@
 import Navbar from '@/components/Navbar';
-import MapComponent from '@/components/MapComponent';
+
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('../../components/MapComponent'), {
+  ssr: false, // Désactive le rendu côté serveur
+  loading: () => <p>Chargement de la carte...</p>,
+});
 
 const MapPage = () => {
   return (
