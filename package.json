@@ -8,7 +8,7 @@
     "lint": "next lint",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "next dev",
-    "dev:backend": "node backend/server.js"
+    "dev:backend": "node backend/server.js",
     "lint": "next lint",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "next dev",
