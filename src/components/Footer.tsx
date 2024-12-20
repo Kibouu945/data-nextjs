@@ -7,7 +7,7 @@ const Footer = () => {
         <p className="text-sm">&copy; {new Date().getFullYear()} NYC Urban Data Analytics. Tous droits réservés.</p>
         <div className="mt-2 flex justify-center gap-4">
           <a
-            href="https://github.com/Kibouu945/nyc-data-m6-grp6"
+            href="https://github.com/Kibouu945/data-nextjs"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-500 transition"
@@ -21,6 +21,14 @@ const Footer = () => {
             className="hover:text-blue-500 transition"
           >
             API CityBikes
+          </a>
+          <a
+            href="https://opendata.cityofnewyork.us/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-blue-500 transition"
+          >
+            API NYC Open Data
           </a>
         </div>
       </div>

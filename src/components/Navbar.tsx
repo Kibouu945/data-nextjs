@@ -22,12 +22,6 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link href="/stations" className="hover:text-blue-600 transition-colors">
-              <Bike className="inline-block w-4 h-4 mr-1" />
-              Stations
-            </Link>
-          </li>
-          <li>
             <Link href="/map" className="hover:text-blue-600 transition-colors">
               <Map className="inline-block w-4 h-4 mr-1" />
               Carte

@@ -14,11 +14,6 @@ const Home = () => {
         </p>
         
         <div className="flex justify-center gap-8">
-          <Link href="/stations" passHref>
-            <span className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300">
-              Voir les Stations de Vélos
-            </span>
-          </Link>
           <Link href="/map" passHref>
             <span className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition duration-300">
               Voir la Carte
