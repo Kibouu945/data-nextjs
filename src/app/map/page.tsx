@@ -3,7 +3,6 @@ import Navbar from '@/components/Navbar';
 import dynamic from 'next/dynamic';
 
 const MapComponent = dynamic(() => import('../../components/MapComponent'), {
-  ssr: false, // Désactive le rendu côté serveur
   loading: () => <p>Chargement de la carte...</p>,
 });
 

@@ -1,38 +1,56 @@
-// backend/server.js
-
-
 const express = require('express');
 const axios = require('axios');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const { importDataToPostgres } = require('./importData'); 
+const { getLicences } = require('./importData'); 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // Autoriser toutes les origines (pour le développement)
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
 
 const PORT = 4000;
-const BIKE_API_URL = 'https://api.citybik.es/v2/networks/citi-bike-nyc'; // API pour les données des vélos
+const BIKE_API_URL = 'https://api.citybik.es/v2/networks/citi-bike-nyc';
 
 app.use(cors());
 app.use(express.json());
 
-// Backend : Filtrage par Bounding Box
+// Route pour importer les données dans PostgreSQL
+app.post('/api/import-data', async (req, res) => {
+  try {
+    await importDataToPostgres(); // Appelle la fonction d'importation
+    res.status(200).json({ message: 'Données importées avec succès dans PostgreSQL.' });
+  } catch (error) {
+    console.error('Erreur lors de l\'importation des données :', error.message);
+    res.status(500).json({ error: 'Erreur lors de l\'importation des données.' });
+  }
+});
+// Route pour récupérer les données des licences
+app.get('/api/licences', async (req, res) => {
+  try {
+    const licences = await getLicences(); // Récupère les données depuis PostgreSQL
+    res.status(200).json(licences);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données :', error.message);
+    res.status(500).json({ error: 'Erreur lors de la récupération des données.' });
+  }
+});
 // Route API pour récupérer les données des vélos
 let cachedData = null;
 let lastFetchTime = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes en millisecondes
+const CACHE_DURATION = 5 * 60 * 1000;
 
+// Route API pour récupérer les données des vélos
 app.get('/api/bikes', async (req, res) => {
   const { ne_lat, ne_lng, sw_lat, sw_lng } = req.query;
   const currentTime = new Date().getTime();
 
-  // Utilise les données en cache si elles sont encore valides
   if (cachedData && lastFetchTime && currentTime - lastFetchTime < CACHE_DURATION) {
     console.log('Envoi des données depuis le cache');
     const filteredStations = cachedData.filter(
@@ -50,7 +68,6 @@ app.get('/api/bikes', async (req, res) => {
     const response = await axios.get(BIKE_API_URL);
     const stations = response.data.network.stations;
 
-    // Mise en cache des données
     cachedData = stations;
     lastFetchTime = new Date().getTime();
 
@@ -70,8 +87,6 @@ app.get('/api/bikes', async (req, res) => {
   }
 });
 
-
-
 // Socket.IO pour les mises à jour en temps réel
 io.on('connection', (socket) => {
   console.log('Client connecté via Socket.IO');
@@ -85,8 +100,8 @@ io.on('connection', (socket) => {
     }
   };
 
-  fetchAndEmitBikeData(); // Fetch les données immédiatement
-  const interval = setInterval(fetchAndEmitBikeData, 10000); // Mettre à jour toutes les 10 secondes
+  fetchAndEmitBikeData();
+  const interval = setInterval(fetchAndEmitBikeData, 10000);
 
   socket.on('disconnect', () => {
     console.log('Client déconnecté');

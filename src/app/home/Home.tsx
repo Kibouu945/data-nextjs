@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import About from '@/components/About';
 
 const Home = () => {
   return (
@@ -9,7 +10,7 @@ const Home = () => {
       <main className="flex-grow p-8">
         <h1 className="text-4xl font-bold text-center text-blue-600 mb-6">Bienvenue sur NYC Urban Data Analytics</h1>
         <p className="text-lg text-center mb-8">
-          Une application interactive pour explorer les données de criminalité et de transport en libre-service de New York City.
+          Une application interactive pour explorer les données statistiques et de transport en libre-service de New York City.
         </p>
         
         <div className="flex justify-center gap-8">

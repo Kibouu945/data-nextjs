@@ -5,7 +5,6 @@ import axios from 'axios';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import io from 'socket.io-client';
 import 'leaflet/dist/leaflet.css';
 
 // Correction des icônes Leaflet par défaut
@@ -67,8 +66,7 @@ const MapComponent = () => {
   return (
     <div className="w-full h-[500px]">
       <MapContainer
-        center={[40.7128, -74.006]} // Coordonnées de New York
-        center={[40.7128, -74.006]} // Coordonnées de New York
+        center={[40.7128, -74.006]} // Coordonnées de New York City
         zoom={13}
         scrollWheelZoom={true}
         className="w-full h-full"

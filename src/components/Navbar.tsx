@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils'; // Utilitaire CN (si configuré par ShadCN)
-import { Menu, Bike, Map, Info, Home, MapPin } from 'lucide-react';
+import { Menu, Bike, Map, Info, Home, MapPin, Book } from 'lucide-react';
+import React from 'react';
 
 const Navbar = () => {
   return (
@@ -30,6 +31,12 @@ const Navbar = () => {
             <Link href="/map" className="hover:text-blue-600 transition-colors">
               <Map className="inline-block w-4 h-4 mr-1" />
               Carte
+            </Link>
+          </li>
+          <li>
+            <Link href="/licences-tbc-graphs" className="hover:text-blue-600 transition-colors">
+              < Book className="inline-block w-4 h-4 mr-1" />
+              Plafonds de Licences à NYC
             </Link>
           </li>
           <li>
@@ -71,7 +78,7 @@ const Navbar = () => {
                 <Link href="/map" className="flex items-center text-gray-700 hover:text-blue-600 w-full">
                   <MapPin className="w-5 h-5 mr-2" /> Carte
                 </Link>
-                <Link href="/about" className="flex items-center text-gray-700 hover:text-blue-600 w-full">
+                <Link href="/licences-tbc-graphs" className="flex items-center text-gray-700 hover:text-blue-600 w-full">
                   <Info className="w-5 h-5 mr-2" /> À Propos
                 </Link>
               </div>
