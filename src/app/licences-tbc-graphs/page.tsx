@@ -11,10 +11,10 @@ const LicencesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://data.cityofnewyork.us/resource/p2wf-m8zt.json');
-        const transformedData = response.data.map((item: { borough: any; community_district: any; tobacco_retail_dealer_cap: any; active_tobacco_retail_dealer: any; }) => ({
+        // Appel vers votre backend pour récupérer les données des licences
+        const response = await axios.get('http://localhost:4000/api/licences'); // Changez l'URL si nécessaire
+        const transformedData = response.data.map((item: { borough: any; tobacco_retail_dealer_cap: any; active_tobacco_retail_dealer: any; }) => ({
           borough: item.borough || 'Inconnu',
-          community_district: item.community_district || '0',
           tobacco_retail_dealer_cap: parseInt(item.tobacco_retail_dealer_cap || 0),
           active_tobacco_retail_dealer: parseInt(item.active_tobacco_retail_dealer || 0),
         }));
@@ -25,7 +25,7 @@ const LicencesPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, []); // Appel une seule fois lors du montage du composant
 
   if (error) {
     return <div className="text-center text-red-600">Une erreur est survenue lors du chargement des données.</div>;
